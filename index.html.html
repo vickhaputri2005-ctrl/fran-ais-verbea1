@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Conjugaison : Les Loisirs et Sorties</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        joker: {
+                            purple: '#6B21A8', // Deep Violet
+                            purpleLight: '#8B5CF6', // Accent Purple
+                            green: '#10B981', // Vivid Joker Green
+                            greenDark: '#047857', // Dark Emerald/Green
+                            bgLight: '#F3F4F6',
+                            cardBg: '#FFFFFF',
+                            darkText: '#1F2937'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #2e1065 0%, #064e3b 100%);
+            min-height: 100vh;
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(107, 33, 168, 0.3), 0 8px 10px -6px rgba(16, 185, 129, 0.3);
+        }
+        .animated-bg {
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 min-h-screen text-slate-800">
+
+    <!-- Container Utama -->
+    <div class="w-full max-w-2xl bg-white rounded-3xl custom-shadow overflow-hidden border-4 border-joker-green transition-all duration-300">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-joker-purple via-purple-900 to-joker-green p-6 text-white text-center relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-20 text-8xl">
+                <i class="fa-solid fa-icons"></i>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-wide mb-1 drop-shadow-md">
+                <i class="fa-solid fa-gamepad mr-2 text-joker-green"></i> La Conjugaison en Jeu
+            </h1>
+            <p class="text-xs sm:text-sm text-purple-200 font-medium">Thème : <span class="text-joker-green font-bold">Les Loisirs et Sorties</span></p>
+        </div>
+
+        <!-- Ecran d'accueil (Start Screen) -->
+        <div id="start-screen" class="p-6 sm:p-8 text-center space-y-6">
+            <div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto text-joker-purple text-4xl shadow-inner border-2 border-joker-purpleLight">
+                <i class="fa-solid fa-masks-theater"></i>
+            </div>
+            
+            <div class="space-y-2">
+                <h2 class="text-xl sm:text-2xl font-bold text-joker-purple">Évaluez votre niveau !</h2>
+                <p class="text-gray-600 text-sm max-w-md mx-auto">
+                    Testez vos connaissances sur la conjugaison des verbes fréquents utilisés pour parler des activités de loisirs et des sorties au présent de l'indicatif.
+                </p>
+            </div>
+
+            <div class="bg-purple-50 p-4 rounded-2xl border border-purple-200 text-left text-xs sm:text-sm text-purple-900 space-y-2">
+                <div class="flex items-center gap-2 font-bold text-joker-purple">
+                    <i class="fa-solid fa-circle-info"></i> Consignes du quiz :
+                </div>
+                <ul class="list-disc list-inside space-y-1 text-gray-700">
+                    <li>10 questions à choix multiples (QCM).</li>
+                    <li>Complétez chaque phrase avec la bonne forme verbale.</li>
+                    <li>Obtenez une explication immédiate après chaque réponse.</li>
+                </ul>
+            </div>
+
+            <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-joker-green hover:bg-joker-greenDark text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-200 text-lg flex items-center justify-center mx-auto gap-3">
+                <i class="fa-solid fa-play"></i> Commencer le Test
+            </button>
+        </div>
+
+        <!-- Ecran du Quiz (Quiz Screen) -->
+        <div id="quiz-screen" class="p-6 sm:p-8 space-y-6 hidden">
+            
+            <!-- Barre de Progression & Score -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-semibold text-gray-600">
+                    <span id="question-number" class="text-joker-purple">Question 1/10</span>
+                    <span id="current-score" class="text-joker-greenDark bg-green-100 px-3 py-1 rounded-full border border-green-300">Score : 0</span>
+                </div>
+                <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden p-0.5 border border-gray-300">
+                    <div id="progress-bar" class="bg-gradient-to-r from-joker-purple to-joker-green h-full rounded-full transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+
+            <!-- Conteneur de la Question -->
+            <div class="bg-slate-50 p-5 sm:p-6 rounded-2xl border-2 border-purple-100 shadow-sm relative">
+                <span id="verb-badge" class="absolute -top-3 right-4 bg-joker-purple text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                    Verbe : ---
+                </span>
+                <p id="question-text" class="text-base sm:text-lg font-bold text-gray-800 leading-relaxed pt-2">
+                    <!-- Question teks disisipkan lewat JS -->
+                </p>
+            </div>
+
+            <!-- Choix de réponses -->
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Tombol pilihan diproduksi lewat JS -->
+            </div>
+
+            <!-- Zone de Feedback / Explication -->
+            <div id="feedback-box" class="p-4 rounded-2xl hidden transition-all duration-300">
+                <div id="feedback-title" class="font-bold text-sm sm:text-base mb-1 flex items-center gap-2"></div>
+                <div id="feedback-text" class="text-xs sm:text-sm leading-relaxed"></div>
+            </div>
+
+            <!-- Bouton Suivant -->
+            <div class="flex justify-end pt-2">
+                <button id="next-btn" onclick="nextQuestion()" disabled class="px-6 py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed transition duration-200 flex items-center gap-2">
+                    Question Suivante <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Ecran de fin (Results Screen) -->
+        <div id="result-screen" class="p-6 sm:p-8 text-center space-y-6 hidden">
+            <div id="result-icon-container" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto text-5xl shadow-lg">
+                <!-- Icon dinamique -->
+            </div>
+
+            <div class="space-y-2">
+                <h2 id="result-title" class="text-2xl font-black text-gray-800">Résultat Final</h2>
+                <p id="result-subtitle" class="text-gray-600 text-sm">Voici votre bilan de conjugaison :</p>
+            </div>
+
+            <!-- Score Box -->
+            <div class="bg-gradient-to-br from-purple-50 to-green-50 p-6 rounded-2xl border-2 border-joker-purpleLight max-w-sm mx-auto shadow-sm">
+                <div class="text-4xl sm:text-5xl font-black text-joker-purple mb-1" id="final-score">0 / 10</div>
+                <div class="text-xs font-bold uppercase tracking-widest text-joker-greenDark" id="score-percentage">0% de réussite</div>
+            </div>
+
+            <div id="result-feedback" class="p-4 rounded-xl text-sm leading-relaxed bg-gray-100 text-gray-700 font-medium max-w-md mx-auto">
+                <!-- Pesan evaluasi akhir -->
+            </div>
+
+            <button onclick="restartQuiz()" class="w-full sm:w-auto px-8 py-4 bg-joker-purple hover:bg-purple-900 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-200 text-base flex items-center justify-center mx-auto gap-3">
+                <i class="fa-solid fa-rotate-right"></i> Recommencer le Quiz
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-100 border-t border-gray-200 px-6 py-3 text-center text-xs text-gray-500 font-medium">
+            Exercice de Grammaire Française • Le Présent de l'Indicatif
+        </div>
+    </div>
+
+    <script>
+        // Data Soal (10 Soal Tata Bahasa: Konjugasi Verba Hobi & Kegiatan)
+        const quizData = [
+            {
+                verb: "Faire (Irregulier)",
+                question: "Pendant le week-end, nous _____ du vélo dans le parc.",
+                options: ["faisons", "faites", "font", "fais"],
+                correct: 0,
+                explanation: "Le verbe <b>faire</b> avec le sujet <i>'nous'</i> au présent se conjugue : <b>nous faisons</b>."
+            },
+            {
+                verb: "Aller (Irregulier)",
+                question: "Est-ce que tu _____ au cinéma avec tes amis ce soir ?",
+                options: ["vas", "vais", "va", "allez"],
+                correct: 0,
+                explanation: "Le verbe <b>aller</b> avec le sujet <i>'tu'</i> au présent prend un 's' : <b>tu vas</b>."
+            },
+            {
+                verb: "Jouer (1er groupe)",
+                question: "Les enfants _____ aux jeux vidéo après l'école.",
+                options: ["jouons", "joue", "jouent", "jouez"],
+                correct: 2,
+                explanation: "Avec la 3ème personne du pluriel (<i>Les enfants / ils</i>), la terminaison des verbes en -er est <b>-ent</b> (silencieux)."
+            },
+            {
+                verb: "Sortir (3ème groupe)",
+                question: "Mon frère _____ toujours avec ses copains le samedi soir.",
+                options: ["sortons", "sort", "sorts", "sortent"],
+                correct: 1,
+                explanation: "Le verbe <b>sortir</b> au présent avec <i>'il / mon frère'</i> se termine par un 't' : <b>il sort</b>."
+            },
+            {
+                verb: "Voir (3ème groupe)",
+                question: "Vous _____ une pièce de théâtre au grand centre culturel.",
+                options: ["voyez", "voient", "voyons", "vois"],
+                correct: 0,
+                explanation: "Avec le sujet <i>'vous'</i>, le verbe <b>voir</b> se conjugue avec la terminaison -ez : <b>vous voyez</b>."
+            },
+            {
+                verb: "Pratiquer (1er groupe)",
+                question: "Je _____ la natation deux fois par semaine.",
+                options: ["pratiques", "pratique", "pratiquons", "pratiquent"],
+                correct: 1,
+                explanation: "La terminaison au présent pour le sujet <i>'je'</i> avec les verbes du 1er groupe (-er) est <b>-e</b>."
+            },
+            {
+                verb: "Courir (3ème groupe)",
+                question: "Elles _____ tous les matins pour garder la forme.",
+                options: ["court", "courons", "courent", "cours"],
+                correct: 2,
+                explanation: "Le verbe <b>courir</b> avec le sujet <i>'elles'</i> se conjugue : <b>elles courent</b>."
+            },
+            {
+                verb: "Prendre (3ème groupe)",
+                question: "Nous _____ un verre en terrasse pour célébrer l'anniversaire.",
+                options: ["prenez", "prenons", "prennent", "prends"],
+                correct: 1,
+                explanation: "Pour le verbe <b>prendre</b> avec <i>'nous'</i>, le radical devient 'pren-' : <b>nous prenons</b>."
+            },
+            {
+                verb: "Aimer (1er groupe)",
+                question: "Est-ce qu'ils _____ visiter les musées d'art moderne ?",
+                options: ["aiment", "aime", "aimez", "aimons"],
+                correct: 0,
+                explanation: "Le verbe <b>aimer</b> à la 3ème personne du pluriel (<i>ils</i>) prend la terminaison <b>-ent</b>."
+            },
+            {
+                verb: "Se promener (Pronominal)",
+                question: "Je _____ souvent dans la forêt le dimanche.",
+                options: ["me promène", "te promènes", "se promène", "nous promenons"],
+                correct: 0,
+                explanation: "Au présent, le verbe pronominal <b>se promener</b> avec <i>'je'</i> donne <b>je me promène</b> (avec un accent grave sur le 'è')."
+            }
+        ];
+
+        // Variabel Status Quiz
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+        let isAnswered = false;
+
+        // Elemen DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionNumberEl = document.getElementById('question-number');
+        const currentScoreEl = document.getElementById('current-score');
+        const progressBarEl = document.getElementById('progress-bar');
+        const verbBadgeEl = document.getElementById('verb-badge');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        
+        const feedbackBoxEl = document.getElementById('feedback-box');
+        const feedbackTitleEl = document.getElementById('feedback-title');
+        const feedbackTextEl = document.getElementById('feedback-text');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Web Audio API untuk Efek Suara (Tanpa File Eksternal)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+                osc.frequency.exponentialRampToValueAtTime(174.61, audioCtx.currentTime + 0.2); // F3
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // Fungsi Memulai Quiz
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // Memuat Question
+        function loadQuestion() {
+            isAnswered = false;
+            selectedOption = null;
+
+            // Reset UI
+            feedbackBoxEl.classList.add('hidden');
+            feedbackBoxEl.className = "p-4 rounded-2xl hidden transition-all duration-300";
+            
+            nextBtn.disabled = true;
+            nextBtn.className = "px-6 py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed transition duration-200 flex items-center gap-2";
+
+            const currentData = quizData[currentQuestionIndex];
+
+            // Update Progress
+            questionNumberEl.textContent = `Question ${currentQuestionIndex + 1}/${quizData.length}`;
+            currentScoreEl.textContent = `Score : ${score}`;
+            const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBarEl.style.width = `${progressPercent}%`;
+
+            // Display Question
+            verbBadgeEl.textContent = `Verbe : ${currentData.verb}`;
+            
+            // Format kata pengganti titik-titik
+            const formattedQuestion = currentData.question.replace('_____', '<span class="px-3 py-1 bg-purple-100 border-b-2 border-joker-purple text-joker-purple font-extrabold rounded">...</span>');
+            questionTextEl.innerHTML = formattedQuestion;
+
+            // Display Options
+            optionsContainerEl.innerHTML = '';
+            currentData.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 text-left font-semibold rounded-xl border-2 border-gray-200 hover:border-joker-purpleLight hover:bg-purple-50 transition-all duration-150 flex items-center justify-between text-gray-700 shadow-sm";
+                btn.innerHTML = `
+                    <span><strong class="text-joker-purple mr-2">${String.fromCharCode(65 + index)}.</strong> ${opt}</span>
+                    <i class="fa-regular fa-circle text-gray-300 check-icon"></i>
+                `;
+                btn.onclick = () => selectOption(index);
+                optionsContainerEl.appendChild(btn);
+            });
+        }
+
+        // Memilih Jawaban
+        function selectOption(index) {
+            if (isAnswered) return;
+            isAnswered = true;
+            selectedOption = index;
+
+            const currentData = quizData[currentQuestionIndex];
+            const optionButtons = optionsContainerEl.children;
+
+            // Disable all options
+            for (let btn of optionButtons) {
+                btn.classList.add('cursor-default');
+                btn.onclick = null;
+            }
+
+            // Validasi Jawaban
+            if (index === currentData.correct) {
+                // Benar
+                score++;
+                playSound('correct');
+                currentScoreEl.textContent = `Score : ${score}`;
+                
+                optionButtons[index].className = "w-full p-4 text-left font-bold rounded-xl border-2 border-joker-green bg-green-50 text-joker-greenDark flex items-center justify-between shadow-sm";
+                optionButtons[index].querySelector('.check-icon').className = "fa-solid fa-circle-check text-joker-green text-xl";
+
+                feedbackBoxEl.className = "p-4 rounded-2xl bg-green-50 border-2 border-joker-green text-emerald-900 transition-all duration-300";
+                feedbackTitleEl.innerHTML = `<i class="fa-solid fa-circle-check text-joker-green"></i> Excellent ! Bonne réponse.`;
+            } else {
+                // Salah
+                playSound('wrong');
+                optionButtons[index].className = "w-full p-4 text-left font-bold rounded-xl border-2 border-red-400 bg-red-50 text-red-700 flex items-center justify-between shadow-sm";
+                optionButtons[index].querySelector('.check-icon').className = "fa-solid fa-circle-xmark text-red-500 text-xl";
+
+                // Highlight Jawaban yang Benar
+                optionButtons[currentData.correct].className = "w-full p-4 text-left font-bold rounded-xl border-2 border-joker-green bg-green-50 text-joker-greenDark flex items-center justify-between shadow-sm";
+                optionButtons[currentData.correct].querySelector('.check-icon').className = "fa-solid fa-circle-check text-joker-green text-xl";
+
+                feedbackBoxEl.className = "p-4 rounded-2xl bg-red-50 border-2 border-red-300 text-red-900 transition-all duration-300";
+                feedbackTitleEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-500"></i> Dommage ! Réponse incorrecte.`;
+            }
+
+            // Tampilkan Explication
+            feedbackTextEl.innerHTML = currentData.explanation;
+            feedbackBoxEl.classList.remove('hidden');
+
+            // Enable Next Button
+            nextBtn.disabled = false;
+            nextBtn.className = "px-6 py-3 bg-joker-green hover:bg-joker-greenDark text-white font-bold rounded-xl cursor-pointer shadow-md hover:shadow-lg transition duration-200 flex items-center gap-2 transform hover:-translate-y-0.5";
+            
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextBtn.innerHTML = `Voir les résultats <i class="fa-solid fa-trophy"></i>`;
+            }
+        }
+
+        // Lanjut ke Soal Berikutnya
+        function nextQuestion() {
+            if (!isAnswered) return;
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Menampilkan Hasil Akhir
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('final-score').textContent = `${score} / ${quizData.length}`;
+            document.getElementById('score-percentage').textContent = `${percentage}% de réussite`;
+
+            const iconContainer = document.getElementById('result-icon-container');
+            const resultTitle = document.getElementById('result-title');
+            const resultFeedback = document.getElementById('result-feedback');
+
+            if (percentage >= 80) {
+                iconContainer.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto text-5xl shadow-lg bg-green-100 text-joker-green border-4 border-joker-green";
+                iconContainer.innerHTML = `<i class="fa-solid fa-award"></i>`;
+                resultTitle.textContent = "Félicitations ! Bravo !";
+                resultFeedback.innerHTML = "Vous maîtrisez très bien la conjugaison des verbes pour parler des loisirs et sorties ! Continuez ainsi !";
+            } else if (percentage >= 50) {
+                iconContainer.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto text-5xl shadow-lg bg-purple-100 text-joker-purple border-4 border-joker-purple";
+                iconContainer.innerHTML = `<i class="fa-solid fa-thumbs-up"></i>`;
+                resultTitle.textContent = "Bon travail !";
+                resultFeedback.innerHTML = "Vous avez de bonnes bases, mais quelques révisions sur certains verbes irréguliers vous aideront à être parfait !";
+            } else {
+                iconContainer.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto text-5xl shadow-lg bg-orange-100 text-orange-500 border-4 border-orange-400";
+                iconContainer.innerHTML = `<i class="fa-solid fa-book-open"></i>`;
+                resultTitle.textContent = "Encore un effort !";
+                resultFeedback.innerHTML = "N'hésitez pas à réviser le présent de l'indicatif des verbes du 3ème groupe et refaire le test pour vous améliorer.";
+            }
+        }
+
+        // Restart Quiz
+        function restartQuiz() {
+            startQuiz();
+        }
+    </script>
+</body>
+</html>
